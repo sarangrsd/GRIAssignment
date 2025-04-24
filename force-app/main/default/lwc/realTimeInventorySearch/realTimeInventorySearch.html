@@ -1,0 +1,48 @@
+<template>
+    <lightning-card title="Product Availability Search" icon-name="custom:custom63">
+        <div class="slds-p-around_medium">
+            <lightning-combobox
+                name="region"
+                label="Select Region"
+                value={selectedRegion}
+                options={regionOptions}
+                onchange={handleRegionChange}>
+            </lightning-combobox>
+
+            <lightning-dual-listbox
+                name="products"
+                label="Select Product SKUs"
+                source-label="Available"
+                selected-label="Selected"
+                field-level-help="Select multiple products to check availability"
+                options={productOptions}
+                onchange={handleProductChange}
+                class="slds-m-bottom_medium">
+            </lightning-dual-listbox>
+
+            <lightning-button
+                variant="brand"
+                label="Search Availability"
+                onclick={handleSearch}
+                class="slds-m-top_medium slds-m-bottom_medium">
+            </lightning-button>
+
+            <template if:true={loading}>
+                <div class="slds-p-top_medium slds-m-bottom_medium">Searching, please wait...</div>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-p-top_medium slds-m-bottom_medium">{error}</div>
+            </template>
+
+            <template if:true={results.length}>
+                <div class="slds-text-heading_medium slds-m-top_medium slds-m-bottom_medium">Search Results</div>
+                <lightning-datatable
+                    key-field="sku"
+                    data={results}
+                    columns={columns}>
+                </lightning-datatable>
+            </template>
+        </div>
+    </lightning-card>
+</template>

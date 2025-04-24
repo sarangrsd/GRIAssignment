@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Region_Name__c</fullName>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Region Name</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Canada East</fullName>
+                <default>false</default>
+                <label>Canada East</label>
+            </value>
+            <value>
+                <fullName>Canada North</fullName>
+                <default>false</default>
+                <label>Canada North</label>
+            </value>
+            <value>
+                <fullName>Canada South</fullName>
+                <default>false</default>
+                <label>Canada South</label>
+            </value>
+            <value>
+                <fullName>Canada West</fullName>
+                <default>false</default>
+                <label>Canada West</label>
+            </value>
+            <value>
+                <fullName>Mexico</fullName>
+                <default>false</default>
+                <label>Mexico</label>
+            </value>
+            <value>
+                <fullName>US Central</fullName>
+                <default>false</default>
+                <label>US Central</label>
+            </value>
+            <value>
+                <fullName>US East</fullName>
+                <default>false</default>
+                <label>US East</label>
+            </value>
+            <value>
+                <fullName>US North</fullName>
+                <default>false</default>
+                <label>US North</label>
+            </value>
+            <value>
+                <fullName>US South</fullName>
+                <default>false</default>
+                <label>US South</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
