@@ -3,18 +3,26 @@ public with sharing class ProductSearchController {
     // Test variable used for holding a reference to the Continuation Request
     @TestVisible
     private static String continuationLabel;
-    
     // Test variable used for holding the value of the Continuation.state attribute
     @TestVisible
     private static String continuationStateString;
     
+    //Method to fetch product SKU list and regions
     @AuraEnabled(cacheable=true)
     public static PicklistWrapper loadPicklistValues() {
-        List<Product2> products = ProductSelector.getAllProducts();
-        List<Regions__mdt> regions = RegionSelector.getAllRegions();
-        return new PicklistWrapper(products, regions);
+        try{
+            ProductSelector psInstance = new ProductSelector(true, true, true,new Set<String>{'Id','Name','StockKeepingUnit'});
+            List<Product2> products = psInstance.getAllProducts();
+            List<Regions__mdt> regions = RegionSelector.getAllRegions();
+            return new PicklistWrapper(products, regions);   
+        }
+        catch (Exception ex) {
+            throw new AuraHandledException('Error fetching data: ' + ex.getMessage());
+        }
     }
     
+    
+    //Called from LWC realTimeInventorySearch when users selects products and regions to search.
     @AuraEnabled(continuation=true)
     public static Continuation searchProductAvailabilityAsync(List<String> productSKUs, String region) {
         Continuation cont = new Continuation(120);
@@ -24,16 +32,17 @@ public with sharing class ProductSearchController {
             HttpRequest req = ServiceUtilities.makeHTTPCallout('GET', 'https://dummyjson.com/c/e253-d4e3-4ba7-bb50', JSON.serialize(new Map<String, Object>{
                 'productSKUs' => productSKUs,
                     'region' => region
-                    }));
+                    }));//TODO: credentials storage with named credentials/external services.
             continuationLabel = cont.addHttpRequest(req)	;// Store the reference to the HttRequest and make it accessible for a test-context
             // Store data to be sent to the callback function
             Object continuationState = new StateInfo(productSKUs,region,continuationLabel);
-            
             continuationStateString =  JSON.serialize(continuationState);
             cont.state = continuationState;
-            
         } catch (Exception ex) {
-            Error_Log__c log = new Error_Log__c(Location__c='ProductSearchController.searchProductAvailabilityAsync', Error_Message__c=ex.getMessage(), Stack_Trace__c=ex.getStackTraceString(), Exception_Type__c=ex.getTypeName());
+            Error_Log__c log = new Error_Log__c(Location__c='ProductSearchController.searchProductAvailabilityAsync',
+                                                Error_Message__c=ex.getMessage(),
+                                                Stack_Trace__c=ex.getStackTraceString(),
+                                                Exception_Type__c=ex.getTypeName());
             insert log;
             throw new AuraHandledException('Error preparing callout: ' + ex.getMessage());
         }
@@ -41,7 +50,8 @@ public with sharing class ProductSearchController {
         return cont;
     }
     
-    @AuraEnabled(cacheable=true)
+    //Callback function invoked after contiuation is returned to process the response and show search results to LWC.
+    @AuraEnabled
     public static Object handleAsyncResponse(Object state) {
         StateInfo stateMap = (StateInfo) state;
         system.debug('State: ' + JSON.serialize(stateMap));
@@ -68,7 +78,7 @@ public with sharing class ProductSearchController {
         }
     }
     
-    // Declare inner class to hold state info
+    // Inner class to hold state info
     public class StateInfo {
         List<String> productSKUs;
         String region;
