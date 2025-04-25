@@ -68,6 +68,7 @@ private class ProductSearchServiceTest {
             ProductSearchController.handleAsyncResponse(contiStateObj);
         } catch (AuraHandledException ex) {
             System.assert(ex.getMessage().contains('Script-thrown exception'));	//Can be more enhanced based on Error log verification etc. TODO
+            system.assertEquals(1, [select id from Error_log__c].size());
         }
     }
     
